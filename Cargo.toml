@@ -1,0 +1,21 @@
+[package]
+name = "waydroid-upgrade"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+chrono = "0.4.39"
+configparser = { version = "3.1.0", features = ["tokio"] }
+env_logger = "0.11.6"
+log = { version = "0.4.25", features = ["max_level_debug", "release_max_level_info"] }
+reqwest = { version = "0.12.12", features = ["json"] }
+rust-ini = "0.21.1"
+serde = { version = "1.0.217", features = ["derive"] }
+tokio = { version = "1.43.0", features = ["macros", "process", "rt-multi-thread"] }
+
+[profile.release]
+panic = "abort"
+lto = true
+strip = true
+codegen-units = 1
