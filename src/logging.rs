@@ -8,7 +8,7 @@ use env_logger::{
 use log::LevelFilter;
 
 pub fn setup_logger(level: LevelFilter) {
-    Builder::from_default_env()
+    Builder::new()
         .format(|buf, record| {
             let subtle = Style::new().fg_color(Some(AnsiColor::BrightBlack.into()));
             let level_style = buf.default_level_style(record.level());
@@ -23,5 +23,6 @@ pub fn setup_logger(level: LevelFilter) {
             )
         })
         .filter_level(level)
+        .parse_default_env()
         .init();
 }

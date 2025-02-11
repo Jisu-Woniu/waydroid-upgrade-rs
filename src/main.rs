@@ -123,7 +123,7 @@ async fn main() -> LogResult<ExitCode> {
                 info!("Run `sudo waydroid upgrade` to apply them.");
                 return Ok(ExitCode::from(upgrades));
             } else {
-                info!("Upgrading...");
+                info!("Upgrading with `sudo waydroid upgrade`...");
                 let status = tokio::process::Command::new("sudo")
                     .arg("waydroid")
                     .arg("upgrade")
