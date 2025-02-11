@@ -18,7 +18,7 @@ use std::{
 };
 
 use chrono::{DateTime, NaiveDate, Utc};
-use log::{info, warn, LevelFilter};
+use log::{debug, info, warn, LevelFilter};
 use reqwest::Client;
 use serde::Deserialize;
 use tokio::join;
@@ -41,16 +41,12 @@ struct UpdateDateTime {
 
 /// Fetch Waydroid update JSON from a URL.
 async fn get_update_json(client: &Client, url: &str) -> reqwest::Result<Vec<UpdateDateTime>> {
-    info!(r#"Checking "{url}" for updates"#);
+    debug!(r#"Checking {url} for updates"#);
 
-    Ok(client
-        .get(url)
-        .send()
-        .await?
-        .error_for_status()?
-        .json::<WaydroidResponse>()
-        .await?
-        .response)
+    let response = client.get(url).send().await?.error_for_status()?;
+    debug!("Received JSON from {url}, extracting...");
+
+    Ok(response.json::<WaydroidResponse>().await?.response)
 }
 
 fn naive_date_from_epoch(unix_epoch: u64) -> NaiveDate {
