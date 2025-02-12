@@ -12,12 +12,8 @@ mod error;
 mod logging;
 mod tools;
 
-use std::{
-    process::ExitCode,
-    time::{Duration, UNIX_EPOCH},
-};
+use std::process::ExitCode;
 
-use chrono::{DateTime, NaiveDate, Utc};
 use log::{debug, info, warn, LevelFilter};
 use reqwest::Client;
 use serde::Deserialize;
@@ -26,32 +22,23 @@ use tokio::join;
 use crate::{
     error::LogResult,
     logging::setup_logger,
-    tools::{load_config, PREINSTALLED_IMAGES_PATHS},
+    tools::{deserialize_max, load_config, UpdateDateTime, PREINSTALLED_IMAGES_PATHS},
 };
 
-#[derive(Debug, Deserialize)]
-struct WaydroidResponse {
-    response: Vec<UpdateDateTime>,
-}
-
-#[derive(Debug, Deserialize)]
-struct UpdateDateTime {
-    datetime: u64,
-}
-
 /// Fetch Waydroid update JSON from a URL.
-async fn get_update_json(client: &Client, url: &str) -> reqwest::Result<Vec<UpdateDateTime>> {
+async fn get_update_json(client: &Client, url: &str) -> reqwest::Result<UpdateDateTime> {
+    #[derive(Debug, Deserialize)]
+    struct WaydroidResponse {
+        #[serde(deserialize_with = "deserialize_max")]
+        response: UpdateDateTime,
+    }
+
     debug!(r#"Checking {url} for updates"#);
 
     let response = client.get(url).send().await?.error_for_status()?;
     debug!("Received JSON from {url}, extracting...");
 
     Ok(response.json::<WaydroidResponse>().await?.response)
-}
-
-fn naive_date_from_epoch(unix_epoch: u64) -> NaiveDate {
-    let system_datetime = UNIX_EPOCH + Duration::from_secs(unix_epoch);
-    DateTime::<Utc>::from(system_datetime).date_naive()
 }
 
 #[tokio::main]
@@ -81,40 +68,35 @@ async fn main() -> LogResult<ExitCode> {
             get_update_json(&client, vendor_ota_url)
         );
 
-        let system_update_datetime = system_updates?[0].datetime;
-        let vendor_update_datetime = vendor_updates?[0].datetime;
+        let system_update_datetime = system_updates?;
+        let vendor_update_datetime = vendor_updates?;
         let mut upgrades = 0;
         let system_datetime = config["system_datetime"].parse()?;
+
         if system_update_datetime > system_datetime {
             info!(
-                "System image upgrade available: {}",
-                naive_date_from_epoch(system_update_datetime)
+                "System image upgrade available: {} (from {})",
+                system_update_datetime, system_datetime
             );
             upgrades += 1;
         } else {
-            info!(
-                "System image is up to date: {}",
-                naive_date_from_epoch(system_datetime)
-            );
+            info!("System image is up to date: {}", system_datetime);
         }
 
         let vendor_datetime = config["vendor_datetime"].parse()?;
 
         if vendor_update_datetime > vendor_datetime {
             info!(
-                "Vendor image upgrade available: {}",
-                naive_date_from_epoch(vendor_update_datetime)
+                "Vendor image upgrade available: {} (from {})",
+                vendor_update_datetime, vendor_datetime
             );
             upgrades += 1;
         } else {
-            info!(
-                "Vendor image is up to date: {}",
-                naive_date_from_epoch(vendor_datetime)
-            );
+            info!("Vendor image is up to date: {}", vendor_datetime);
         }
 
         if upgrades != 0 {
-            if let Some(_) = std::env::var_os("NO_UPGRADE") {
+            if std::env::var_os("NO_UPGRADE").is_some() {
                 info!("{upgrades} upgrade(s) available.");
                 info!("Run `sudo waydroid upgrade` to apply them.");
                 return Ok(ExitCode::from(upgrades));
