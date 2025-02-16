@@ -17,20 +17,20 @@ use std::process::ExitCode;
 use log::{debug, info, warn, LevelFilter};
 use reqwest::Client;
 use serde::Deserialize;
-use tokio::join;
+use tokio::try_join;
 
 use crate::{
     error::LogResult,
     logging::setup_logger,
-    tools::{deserialize_max, load_config, UpdateDateTime, PREINSTALLED_IMAGES_PATHS},
+    tools::{deserialize_max, load_config, UpdateDatetime, PREINSTALLED_IMAGES_PATHS},
 };
 
 /// Fetch Waydroid update JSON from a URL.
-async fn get_update_json(client: &Client, url: &str) -> reqwest::Result<UpdateDateTime> {
+async fn get_update_datetime(client: &Client, url: &str) -> reqwest::Result<UpdateDatetime> {
     #[derive(Debug, Deserialize)]
     struct WaydroidResponse {
         #[serde(deserialize_with = "deserialize_max")]
-        response: UpdateDateTime,
+        response: UpdateDatetime,
     }
 
     debug!(r#"Checking {url} for updates"#);
@@ -65,11 +65,10 @@ async fn main() -> LogResult<ExitCode> {
     let (system_update_datetime, vendor_update_datetime) = {
         let client = Client::new();
 
-        let (system_updates, vendor_updates) = join!(
-            get_update_json(&client, system_ota_url),
-            get_update_json(&client, vendor_ota_url)
-        );
-        (system_updates?, vendor_updates?)
+        try_join!(
+            get_update_datetime(&client, system_ota_url),
+            get_update_datetime(&client, vendor_ota_url)
+        )?
     };
 
     let mut upgrades = 0;

@@ -7,17 +7,17 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize, PartialEq, PartialOrd)]
-pub struct UpdateDateTime {
+pub struct UpdateDatetime {
     datetime: i64,
 }
 
-impl UpdateDateTime {
+impl UpdateDatetime {
     pub fn from_epoch(epoch: i64) -> Self {
         Self { datetime: epoch }
     }
 }
 
-impl FromStr for UpdateDateTime {
+impl FromStr for UpdateDatetime {
     type Err = std::num::ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -25,7 +25,7 @@ impl FromStr for UpdateDateTime {
     }
 }
 
-impl Display for UpdateDateTime {
+impl Display for UpdateDatetime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let utc_time = DateTime::<Utc>::from_timestamp(self.datetime, 0).ok_or(fmt::Error)?;
 

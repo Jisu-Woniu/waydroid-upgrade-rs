@@ -9,4 +9,4 @@ mod deserialize;
 pub use deserialize::deserialize_max;
 
 mod datetime;
-pub use datetime::UpdateDateTime;
+pub use datetime::UpdateDatetime;
