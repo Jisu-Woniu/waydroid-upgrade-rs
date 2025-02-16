@@ -52,69 +52,73 @@ async fn main() -> LogResult<ExitCode> {
     let config = load_config();
 
     let image_path = &config["images_path"];
-    if PREINSTALLED_IMAGES_PATHS.contains(&image_path) {
-        warn!("Upgrade refused because Waydroid loads pre-installed image: {image_path}");
-        return Ok(ExitCode::from(255));
+
+    let preinstalled = PREINSTALLED_IMAGES_PATHS.contains(&image_path);
+
+    if preinstalled {
+        warn!("Waydroid is using pre-installed image from {image_path}");
     }
 
     let system_ota_url = &config["system_ota"];
     let vendor_ota_url = &config["vendor_ota"];
 
-    {
+    let (system_update_datetime, vendor_update_datetime) = {
         let client = Client::new();
 
         let (system_updates, vendor_updates) = join!(
             get_update_json(&client, system_ota_url),
             get_update_json(&client, vendor_ota_url)
         );
-
-        let system_update_datetime = system_updates?;
-        let vendor_update_datetime = vendor_updates?;
-        let mut upgrades = 0;
-        let system_datetime = config["system_datetime"].parse()?;
-
-        if system_update_datetime > system_datetime {
-            info!(
-                "System image upgrade available: {} (from {})",
-                system_update_datetime, system_datetime
-            );
-            upgrades += 1;
-        } else {
-            info!("System image is up to date: {}", system_datetime);
-        }
-
-        let vendor_datetime = config["vendor_datetime"].parse()?;
-
-        if vendor_update_datetime > vendor_datetime {
-            info!(
-                "Vendor image upgrade available: {} (from {})",
-                vendor_update_datetime, vendor_datetime
-            );
-            upgrades += 1;
-        } else {
-            info!("Vendor image is up to date: {}", vendor_datetime);
-        }
-
-        if upgrades != 0 {
-            if std::env::var_os("NO_UPGRADE").is_some() {
-                info!("{upgrades} upgrade(s) available.");
-                info!("Run `sudo waydroid upgrade` to apply them.");
-                return Ok(ExitCode::from(upgrades));
-            } else {
-                info!("Upgrading with `sudo waydroid upgrade`...");
-                let status = tokio::process::Command::new("sudo")
-                    .arg("waydroid")
-                    .arg("upgrade")
-                    .status()
-                    .await?
-                    .code()
-                    .unwrap_or(1) as u8;
-                return Ok(ExitCode::from(status));
-            }
-        } else {
-            info!("No upgrades available.");
-        }
+        (system_updates?, vendor_updates?)
     };
 
-    Ok(ExitCode::SUCCESS)
+    let mut upgrades = 0;
+    let system_datetime = config["system_datetime"].parse()?;
+
+    if system_update_datetime > system_datetime {
+        info!(
+            "System image upgrade available: {} (from {})",
+            system_update_datetime, system_datetime
+        );
+        upgrades += 1;
+    } else {
+        info!("System image is up to date: {}", system_datetime);
+    }
+
+    let vendor_datetime = config["vendor_datetime"].parse()?;
+
+    if vendor_update_datetime > vendor_datetime {
+        info!(
+            "Vendor image upgrade available: {} (from {})",
+            vendor_update_datetime, vendor_datetime
+        );
+        upgrades += 1;
+    } else {
+        info!("Vendor image is up to date: {}", vendor_datetime);
+    }
+
+    if upgrades != 0 {
+        if preinstalled {
+            info!("{upgrades} upgrade(s) available.");
+            info!("You are using preinstalled image, so you need to upgrade manually.");
+            Ok(ExitCode::from(upgrades))
+        } else if std::env::var_os("NO_UPGRADE").is_some() {
+            info!("{upgrades} upgrade(s) available.");
+            info!("Run `sudo waydroid upgrade` to apply them.");
+            Ok(ExitCode::from(upgrades))
+        } else {
+            info!("Upgrading with `sudo waydroid upgrade`...");
+            let status = tokio::process::Command::new("sudo")
+                .arg("waydroid")
+                .arg("upgrade")
+                .status()
+                .await?
+                .code()
+                .unwrap_or(1) as u8;
+            Ok(ExitCode::from(status))
+        }
+    } else {
+        info!("No upgrades available.");
+        Ok(ExitCode::SUCCESS)
+    }
 }
