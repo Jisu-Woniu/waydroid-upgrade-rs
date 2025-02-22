@@ -4,13 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-anyhow = "1.0.95"
+anyhow = "1.0.96"
 chrono = "0.4.39"
 env_logger = { version = "0.11.6", default-features = false, features = ["auto-color"] }
-log = { version = "0.4.25", features = ["max_level_debug", "release_max_level_info"] }
+log = { version = "0.4.26", features = ["max_level_debug", "release_max_level_info"] }
 reqwest = { version = "0.12.12", features = ["json"] }
 rust-ini = "0.21.1"
-serde = { version = "1.0.217", features = ["derive"] }
+serde = { version = "1.0.218", features = ["derive"] }
 tokio = { version = "1.43.0", features = ["macros", "process", "rt-multi-thread"] }
 
 [profile.release]

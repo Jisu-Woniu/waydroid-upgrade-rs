@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use chrono::Local;
+use chrono::{Local, SubsecRound};
 use env_logger::{
     fmt::style::{AnsiColor, Style},
     Builder,
@@ -16,7 +16,7 @@ pub fn setup_logger(level: LevelFilter) {
             writeln!(
                 buf,
                 "{subtle}[{subtle:#}{} {level_style}{:<5}{level_style:#} {}{subtle}]{subtle:#} {}",
-                Local::now().format("%FT%T%.3f%:z"), // Like `2001-07-08T00:34:60.026+09:30`.
+                Local::now().trunc_subsecs(3), // Like `2001-07-08 00:34:60.026 +09:30`.
                 record.level(),
                 record.target(),
                 record.args()
