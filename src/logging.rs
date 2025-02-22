@@ -11,12 +11,12 @@ use log::LevelFilter;
 pub fn setup_logger(level: LevelFilter) {
     Builder::new()
         .format(|buf, record| {
-            let subtle = Style::new().fg_color(Some(AnsiColor::BrightBlack.into()));
+            const SUBTLE: Style = AnsiColor::BrightBlack.on_default();
             let level_style = buf.default_level_style(record.level());
 
             writeln!(
                 buf,
-                "{subtle}[{subtle:#}{} {level_style}{:<5}{level_style:#} {}{subtle}]{subtle:#} {}",
+                "{SUBTLE}[{SUBTLE:#}{} {level_style}{:<5}{level_style:#} {}{SUBTLE}]{SUBTLE:#} {}",
                 Local::now().trunc_subsecs(3), // Like `2001-07-08 00:34:60.026 +09:30`.
                 record.level(),
                 record.target(),

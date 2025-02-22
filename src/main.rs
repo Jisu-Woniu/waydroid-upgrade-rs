@@ -13,12 +13,12 @@ mod error;
 mod logging;
 mod tools;
 
-use std::process::ExitCode;
+use std::{env::var_os, process::ExitCode};
 
 use log::{debug, info, warn, LevelFilter};
 use reqwest::Client;
 use serde::Deserialize;
-use tokio::try_join;
+use tokio::{process::Command, try_join};
 
 use crate::{
     error::LogResult,
@@ -102,15 +102,14 @@ async fn main() -> LogResult<ExitCode> {
             info!("{upgrades} upgrade(s) available.");
             info!("You are using preinstalled image, so you need to upgrade manually.");
             Ok(ExitCode::from(upgrades))
-        } else if std::env::var_os("NO_UPGRADE").is_some() {
+        } else if var_os("NO_UPGRADE").is_some() {
             info!("{upgrades} upgrade(s) available.");
             info!("Run `sudo waydroid upgrade` to apply them.");
             Ok(ExitCode::from(upgrades))
         } else {
             info!("Upgrading with `sudo waydroid upgrade`...");
-            let status = tokio::process::Command::new("sudo")
-                .arg("waydroid")
-                .arg("upgrade")
+            let status = Command::new("sudo")
+                .args(["waydroid", "upgrade"])
                 .status()
                 .await?
                 .code()
