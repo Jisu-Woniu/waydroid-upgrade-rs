@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 //! # waydroid-upgrade
 //!
 //! Checks for upgrades for Waydroid images without restarting sessions.
