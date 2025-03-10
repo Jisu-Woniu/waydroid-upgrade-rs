@@ -64,7 +64,7 @@ async fn main() -> LogResult<ExitCode> {
     let vendor_ota_url = &config["vendor_ota"];
 
     let (system_update_datetime, vendor_update_datetime) = {
-        let client = Client::new();
+        let client = Client::builder().use_rustls_tls().build()?;
 
         try_join!(
             get_update_datetime(&client, system_ota_url),

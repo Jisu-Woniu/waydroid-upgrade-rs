@@ -6,7 +6,6 @@
 use ini::{Ini, Properties};
 use log::{debug, warn};
 
-const CONFIG_KEYS: &[&str] = &["images_path", "system_datetime", "vendor_datetime"];
 pub const PREINSTALLED_IMAGES_PATHS: &[&str] = &[
     "/etc/waydroid-extra/images",
     "/usr/share/waydroid-extra/images",
@@ -29,10 +28,10 @@ pub fn load() -> Properties {
 
     let waydroid_section = cfg
         .entry(Some("waydroid".to_string()))
-        .or_insert_with(Default::default);
+        .or_insert_with(Properties::default);
 
     for (k, v) in DEFAULTS {
-        if CONFIG_KEYS.contains(k) && !waydroid_section.contains_key(k) {
+        if !waydroid_section.contains_key(k) {
             debug!(r#""{k}" unset in configuration, using "{v}" as default"#);
             waydroid_section.insert(k.to_string(), v.to_string());
         }
