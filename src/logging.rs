@@ -3,8 +3,8 @@ use std::io::Write;
 
 use chrono::{Local, SubsecRound};
 use env_logger::{
-    fmt::style::{AnsiColor, Style},
     Builder,
+    fmt::style::{AnsiColor, Style},
 };
 use log::LevelFilter;
 

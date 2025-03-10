@@ -1,8 +1,8 @@
 use std::{fmt, marker::PhantomData};
 
 use serde::{
-    de::{self, SeqAccess, Visitor},
     Deserialize, Deserializer,
+    de::{self, SeqAccess, Visitor},
 };
 
 pub fn deserialize_max<'de, D, T>(deserializer: D) -> Result<T, D::Error>
@@ -11,7 +11,7 @@ where
     T: PartialOrd + Deserialize<'de>,
 {
     struct MaxVisitor<T>(
-        /// `MaxVisitor` generates instances of `T`, so `fn() -> T` is used as parameter.
+        /// `MaxVisitor` generates instances of `T`, so `fn() -> T` is used.
         PhantomData<fn() -> T>,
     );
 

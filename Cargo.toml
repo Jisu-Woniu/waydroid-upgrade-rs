@@ -7,23 +7,14 @@ license = "GPL-3.0-or-later"
 description = "Checks for upgrades for Waydroid images without restarting sessions"
 
 [dependencies]
-anyhow = "1.0.96"
+anyhow = "1.0.97"
 chrono = "0.4.40"
-env_logger = { version = "0.11.6", default-features = false, features = [
-    "auto-color",
-] }
-log = { version = "0.4.26", features = [
-    "max_level_debug",
-    "release_max_level_info",
-] }
+env_logger = { version = "0.11.6", default-features = false, features = ["auto-color"] }
+log = { version = "0.4.26", features = ["max_level_debug", "release_max_level_info"] }
 reqwest = { version = "0.12.12", default-features = false, features = ["gzip", "http2", "json", "rustls-tls"] }
 rust-ini = "0.21.1"
-serde = { version = "1.0.218", features = ["derive"] }
-tokio = { version = "1.43.0", features = [
-    "macros",
-    "process",
-    "rt-multi-thread",
-] }
+serde = { version = "1.0.219", features = ["derive"] }
+tokio = { version = "1.44.0", features = ["macros", "process", "rt-multi-thread"] }
 
 [profile.release]
 codegen-units = 1

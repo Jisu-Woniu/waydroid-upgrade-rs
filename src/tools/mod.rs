@@ -3,7 +3,7 @@
 //! Currently contains the config loader.
 
 mod config;
-pub use config::{load as load_config, PREINSTALLED_IMAGES_PATHS};
+pub use config::{PREINSTALLED_IMAGES_PATHS, load as load_config};
 
 mod deserialize;
 pub use deserialize::deserialize_max;

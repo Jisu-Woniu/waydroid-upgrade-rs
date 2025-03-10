@@ -15,7 +15,7 @@ mod tools;
 
 use std::{env::var_os, process::ExitCode};
 
-use log::{debug, info, warn, LevelFilter};
+use log::{LevelFilter, debug, info, warn};
 use reqwest::Client;
 use serde::Deserialize;
 use tokio::{process::Command, try_join};
@@ -23,7 +23,7 @@ use tokio::{process::Command, try_join};
 use crate::{
     error::LogResult,
     logging::setup_logger,
-    tools::{deserialize_max, load_config, UpdateDatetime, PREINSTALLED_IMAGES_PATHS},
+    tools::{PREINSTALLED_IMAGES_PATHS, UpdateDatetime, deserialize_max, load_config},
 };
 
 /// Fetch Waydroid update JSON from a URL.
