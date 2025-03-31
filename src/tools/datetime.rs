@@ -1,5 +1,6 @@
 use std::{
     fmt::{self, Display},
+    num::ParseIntError,
     str::FromStr,
 };
 
@@ -18,7 +19,7 @@ impl UpdateDatetime {
 }
 
 impl FromStr for UpdateDatetime {
-    type Err = std::num::ParseIntError;
+    type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Self::from_epoch(s.parse()?))
