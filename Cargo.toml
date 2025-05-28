@@ -14,7 +14,7 @@ log = { version = "0.4.27", features = ["max_level_debug", "release_max_level_in
 reqwest = { version = "0.12.16", default-features = false, features = ["gzip", "http2", "json", "rustls-tls"] }
 rust-ini = "0.21.1"
 serde = { version = "1.0.219", features = ["derive"] }
-tokio = { version = "1.45.0", features = ["macros", "process", "rt-multi-thread"] }
+tokio = { version = "1.45.1", features = ["macros", "process", "rt-multi-thread"] }
 
 [profile.release]
 codegen-units = 1
