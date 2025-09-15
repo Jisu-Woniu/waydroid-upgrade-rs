@@ -13,7 +13,7 @@ env_logger = { version = "0.11.8", default-features = false, features = ["auto-c
 log = { version = "0.4.28", features = ["max_level_debug", "release_max_level_info"] }
 reqwest = { version = "0.12.23", default-features = false, features = ["gzip", "http2", "json", "rustls-tls"] }
 rust-ini = "0.21.3"
-serde = { version = "1.0.219", features = ["derive"] }
+serde = { version = "1.0.224", features = ["derive"] }
 tokio = { version = "1.47.1", features = ["macros", "process", "rt-multi-thread"] }
 
 [profile.release]
